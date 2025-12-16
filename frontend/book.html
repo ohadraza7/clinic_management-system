@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="book.js" defer></script>
+  </head>
+  <body>
+    <h1>Book Appointment</h1>
+
+    <div class="card">
+      <form id="form">
+        <strong>Patient Info</strong>
+        <input placeholder="Patient Name" id="pid" />
+        <input type="tel" id="ptele" placeholder="Phone Number" />
+        <select id="gender">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+
+        <strong>Doctor Info</strong>
+        <select id="did" onchange="docInfo()">
+          <option value="">Select Doctor</option>
+        </select>
+
+        <input id="speID" placeholder="Specialization" readonly />
+
+        <strong>Appointment Info</strong>
+
+        <select id="time">
+          <option value="">Select Time</option>
+        </select>
+
+        <select id="date">
+          <option value="">Select Date</option>
+        </select>
+
+        <button>Book Appointment</button>
+        <button type="button" onclick="location.href='view.html'">
+          Check Schedules
+        </button>
+      </form>
+
+      <div class="nav">
+        <a href="index.html">Home</a> >
+        <a href="view.html">View Appointments</a> >
+        <a href="myAppointment.html">My Appointments</a>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,111 @@
+/* ========== GLOBAL RESET ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #78a7ff, #c8e6ff);
+  padding: 40px;
+}
+
+/* ========== CARD ========== */
+.card {
+  max-width: 600px;
+  margin: auto;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 30px 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ========== HEADINGS ========== */
+h1, h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+/* ========== BUTTONS ========== */
+button, a.btn {
+  background: #0057ff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-top: 10px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+button:hover, a.btn:hover {
+  background: #003ec7;
+}
+
+/* ========== FORMS ========== */
+form input,
+form select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #bbb;
+  margin: 8px 0 18px 0;
+  font-size: 14px;
+}
+
+form strong {
+  display: block;
+  margin-top: 20px;
+  color: #00387c;
+  font-size: 16px;
+}
+
+/* ========== TABLES ========== */
+.table-container {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th {
+  background: rgba(0, 87, 255, 0.8);
+  color: #fff;
+  padding: 12px;
+}
+
+td {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid #ddd;
+}
+
+/* ========== NAVIGATION ========== */
+.nav {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.nav a {
+  color: #00379a;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}

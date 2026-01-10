@@ -1,53 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Book Appointment</title>
     <link rel="stylesheet" href="style.css" />
     <script src="book.js" defer></script>
   </head>
   <body>
-    <h1>Book Appointment</h1>
+    <div class="container">
+      <h2>Book Appointment</h2>
 
-    <div class="card">
-      <form id="form">
-        <strong>Patient Info</strong>
-        <input placeholder="Patient Name" id="pid" />
-        <input type="tel" id="ptele" placeholder="Phone Number" />
-        <select id="gender">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
+      <!-- STEP 1 -->
+      <div class="step active" id="step1">
+        <h3>Patient Info</h3>
+
+        <input type="text" id="patientName" />
+        <small id="nameError" class="error"></small>
+
+        <input type="text" id="patientPhone" />
+        <small id="phoneError" class="error"></small>
+
+        <select id="patientGender">
+          <option value="">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
         </select>
+        <small id="genderError" class="error"></small>
 
-        <strong>Doctor Info</strong>
-        <select id="did" onchange="docInfo()">
-          <option value="">Select Doctor</option>
-        </select>
+        <button class="nextBtn" id="nextBtn">Next</button>
+      </div>
 
-        <input id="speID" placeholder="Specialization" readonly />
+      <!-- STEP 2 -->
+      <div class="step" id="step2">
+        <h3>Doctor</h3>
+        <select id="doctor"></select>
+        <input id="specialization" readonly placeholder="Specialization" />
+        <button onclick="prevStep()">Back</button>
+        <button onclick="nextStep()">Next</button>
+      </div>
 
-        <strong>Appointment Info</strong>
-
-        <select id="time">
-          <option value="">Select Time</option>
-        </select>
-
-        <select id="date">
-          <option value="">Select Date</option>
-        </select>
-
-        <button>Book Appointment</button>
-        <button type="button" onclick="location.href='view.html'">
-          Check Schedules
-        </button>
-      </form>
-
-      <div class="nav">
-        <a href="index.html">Home</a> >
-        <a href="view.html">View Appointments</a> >
-        <a href="myAppointment.html">My Appointments</a>
+      <!-- STEP 3 -->
+      <div class="step" id="step3">
+        <h3>Schedule</h3>
+        <select id="schedule"></select>
+        <button onclick="prevStep()">Back</button>
+        <button onclick="book()">Confirm</button>
       </div>
     </div>
   </body>

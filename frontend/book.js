@@ -1,153 +1,140 @@
-var appointmentdetials = {
-  DoctorID: "hellow",
-  ScheduleID: "",
-  Date: "",
-  Time: "",
-};
-console.log(appointmentdetials);
-// doctor select onload event
-document.querySelector("#did").addEventListener("onload", (e) => {
-  e.preventDefault();
-  console.log("loaded");
+let step = 1;
+let patientID, doctorID, scheduleID;
+
+document.getElementById("nextBtn").addEventListener("click", function () {
+  const name = document.getElementById("patientName").value;
+  const phone = document.getElementById("patientPhone").value;
+  const gender = document.getElementById("patientGender").value;
+
+  // Clear previous messages
+  document.getElementById("nameError").innerText = "";
+  document.getElementById("phoneError").innerText = "";
+  document.getElementById("genderError").innerText = "";
+
+  let isValid = true;
+
+  // Name Validation
+  if (name === "") {
+    document.getElementById("nameError").innerText = "Patient name is required";
+    alert("Patient name is required");
+    isValid = false;
+  }
+
+  // Phone Validation
+  if (!/^\d{11}$/.test(phone)) {
+    document.getElementById("phoneError").innerText =
+      "Enter a valid 11-digit phone number";
+    alert("Enter a valid 11-digit phone number");
+    isValid = false;
+  }
+
+  // Gender Validation
+  if (gender === "") {
+    document.getElementById("genderError").innerText = "Please select gender";
+    alert("Please select gender");
+    isValid = false;
+  }
+
+  if (!isValid) return;
+
+  // If all validations pass
+  const patient = {
+    name,
+    phone,
+    gender,
+  };
+
+  sessionStorage.setItem("patient", JSON.stringify(patient));
+
+  // Create patient only after validation passes
+  PatientCreate();
+
+  // Move to next step
+  document.getElementById("step1").style.display = "none";
+  document.getElementById("step2").style.display = "block";
 });
 
-// patient table create by this data
-const patienttable = async () => {
-  const PatientName = document.querySelector("#pid").value;
-  const patientPhone = document.querySelector("#ptele").value;
-  const Gender = document.querySelector("#gender").value;
-  const DoctorName = document.querySelector("#did").value;
-  if (sessionStorage.getItem("patientID") === null) {
-    const response = await fetch("http://localhost:5000/patient", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        Name: PatientName,
-        Phone: patientPhone,
-        Gender: Gender,
-      }),
+function nextStep() {
+  document.getElementById(`step${step}`).classList.remove("active");
+  step++;
+  document.getElementById(`step${step}`).classList.add("active");
+}
+
+function prevStep() {
+  document.getElementById(`step${step}`).classList.remove("active");
+  step--;
+  document.getElementById(`step${step}`).classList.add("active");
+}
+
+// Load doctors
+fetch("http://localhost:5000/doctors")
+  .then((res) => res.json())
+  .then((data) => {
+    const d = document.getElementById("doctor");
+    data.forEach((doc) => {
+      d.innerHTML += `<option value="${doc.DoctorID}" data-spec="${doc.Specialization}">
+        ${doc.Name}</option>`;
     });
-    const result = await response.json();
-    appointmentdetials.PatientID = result.PatientID;
-    console.log("Patient ID: " + appointmentdetials.PatientID);
-    sessionStorage.setItem("patientID", appointmentdetials.PatientID);
-    console.log("Saved to session:", appointmentdetials.PatientID);
-  } else {
-    appointmentdetials.PatientID = sessionStorage.getItem("patientID");
-  }
-};
-
-const timeSelect = document.querySelector("#time"); // time select element
-const dateSelect = document.querySelector("#date"); // date select element
-
-// client side fetch schedules
-const schedules = async (doctorID) => {
-  patienttable();
-
-  console.log("schedules inside function: " + doctorID);
-  const response = await fetch(
-    `http://localhost:5000/schedules/${doctorID}`
-  ).then((res) => res.json());
-
-  if (timeSelect.options.length > 1 || dateSelect.options.length > 1) {
-    timeSelect.innerHTML = '<option value="">Select Time</option>';
-    dateSelect.innerHTML = '<option value="">Select Date</option>';
-  }
-  // populate time and date options
-  response.forEach((schedule) => {
-    if (
-      !Array.from(timeSelect.options).some(
-        (option) =>
-          option.value === schedule.StartTime + " - " + schedule.EndTime
-      )
-    ) {
-      const option = document.createElement("option"); // time option
-      console.log(
-        "schedule time: " +
-          schedule.Time +
-          " , start time: " +
-          schedule.StartTime
-      );
-      option.value = schedule.StartTime + " - " + schedule.EndTime; // option value
-      option.textContent = schedule.StartTime + " - " + schedule.EndTime; // option text
-      option.dataset.id = schedule.ScheduleID; // store scheduleID in option
-      timeSelect.appendChild(option); // append time option
-      // avoid duplicate time options
-      const optionDate = document.createElement("option"); // date option
-      optionDate.value = schedule.AvailableDate.split("T")[0]; // date option value
-      optionDate.textContent = schedule.AvailableDate.split("T")[0]; // date option text
-      optionDate.dataset.id = schedule.ScheduleID; // store scheduleID in option
-      dateSelect.appendChild(optionDate); // append date option
-      // avoid duplicate date options
-    }
   });
-};
-// doctor info fetch and specialization auto fill
-const Did = document.querySelector("#did");
-const speID = document.querySelector("#speID");
 
-const docInfo = async () => {
-  const response = await fetch("http://localhost:5000/doctors").then((res) =>
-    res.json()
-  );
+document.getElementById("doctor").addEventListener("change", (e) => {
+  doctorID = e.target.value;
+  document.getElementById("specialization").value =
+    e.target.selectedOptions[0].dataset.spec;
 
-  response.forEach((doctor) => {
-    if (
-      !Array.from(Did.options).some((option) => option.value === doctor.Name)
-    ) {
-      // to avoid duplicates
-      const option = document.createElement("option");
-      option.value = doctor.Name;
-      option.textContent = doctor.Name;
-      option.dataset.id = doctor.DoctorID; // store doctorID in option
-      Did.appendChild(option);
-    }
-    if (Did.value === "") {
-      speID.value = "";
-    } else if (doctor.Name === Did.value) {
-      // when doctor is selected
-      speID.value = doctor.Specialization;
-      console.log("Doctor ID: " + doctor.DoctorID);
-      appointmentdetials.DoctorID = doctor.DoctorID; // store doctorID in appointmentdetails object
-      schedules(doctor.DoctorID); // fetch schedules for selected doctor
-    }
-  });
-};
-docInfo();
+  fetch(`http://localhost:5000/schedules/${doctorID}`)
+    .then((res) => res.json())
+    .then((data) => {
+      const s = document.getElementById("schedule");
+      s.innerHTML = "";
+      data.forEach((sc) => {
+        s.innerHTML += `<option value="${sc.ScheduleID}">
+          ${sc.AvailableDate} (${sc.StartTime} - ${sc.EndTime})
+        </option>`;
+      });
+    });
+});
 
-////// ================== submit form and book appointment ================== /////
-
-document.querySelector("#form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const selectedTimeID =
-    timeSelect.options[timeSelect.selectedIndex].dataset.id;
-  const selectedDateID =
-    dateSelect.options[dateSelect.selectedIndex].dataset.id;
-  if (selectedTimeID === selectedDateID) {
-    appointmentdetials.ScheduleID = selectedTimeID;
-    console.log("Selected ScheduleID: " + appointmentdetials.ScheduleID);
-  } else {
-    alert(
-      "Please select valid time and date" +
-        selectedTimeID +
-        " " +
-        selectedDateID
-    );
+function validatePatient(name, phone, gender) {
+  if (!name || !phone || !gender) {
+    return false;
   }
-  const response = await fetch("http://localhost:5000/book", {
+  return true;
+}
+
+function PatientCreate() {
+  const name = document.getElementById("patientName").value.trim();
+  const phone = document.getElementById("patientPhone").value.trim();
+  const gender = document.getElementById("patientGender").value;
+
+  fetch("http://localhost:5000/patient", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      PatientID: appointmentdetials.PatientID,
-      DoctorID: appointmentdetials.DoctorID,
-      ScheduleID: appointmentdetials.ScheduleID,
-      Date: dateSelect.value,
-      Time: timeSelect.value,
+      Name: name,
+      Phone: phone,
+      Gender: gender,
     }),
-  });
+  })
+    .then((res) => res.json())
+    .then((p) => {
+      alert(`This is your PatientID Copy It ${p.PatientID}`);
+      patientID = p.PatientID;
+    });
+}
 
-  // storing patientID in sessionStorage
-  const data = await response.json();
-  console.log(data);
-  alert(data.message);
-});
+function book() {
+  scheduleID = document.getElementById("schedule").value;
+
+  fetch("http://localhost:5000/book", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      PatientID: patientID,
+      DoctorID: doctorID,
+      ScheduleID: scheduleID,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => alert(data.message));
+}

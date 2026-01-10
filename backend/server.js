@@ -4,8 +4,8 @@ import db from "./db.js";
 
 const app = express();
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
 // patient data insertion
 app.post("/patient", (req, res) => {
@@ -26,7 +26,7 @@ app.post("/patient", (req, res) => {
       message: "Patient Data Inserted!",
       PatientID: results.insertId,
     });
-    console.log(results);
+    console.log(results.insertId);
   });
 });
 
@@ -47,23 +47,49 @@ app.get("/schedules/:doctorID", (req, res) => {
   });
 });
 
-// Book appointment
 app.post("/book", (req, res) => {
   const { PatientID, DoctorID, ScheduleID } = req.body;
-  console.log(req.body);
-  const sql = `
 
-      
-      INSERT INTO Appointment (PatientID, DoctorID, ScheduleID)
-      VALUES (?, ?, ?)
-  `;
+  // Get schedule details
+  const scheduleQuery = "SELECT * FROM Schedule WHERE ScheduleID = ?";
+  db.query(scheduleQuery, [ScheduleID], (err, schedules) => {
+    if (err) return res.json({ error: err });
 
-  db.query(sql, [PatientID, DoctorID, ScheduleID], (err) => {
-    if (err) {
-      console.log("Error: " + err);
-      return res.json({ error: err });
-    }
-    res.json({ message: "Appointment Booked!" });
+    const schedule = schedules[0];
+
+    // Check for overlapping appointments
+    const checkQuery = `
+      SELECT * FROM Appointment a
+      JOIN Schedule s ON a.ScheduleID = s.ScheduleID
+      WHERE a.DoctorID = ?
+        AND s.AvailableDate = ?
+        AND s.StartTime < ?
+        AND s.EndTime > ?;
+    `;
+
+    db.query(
+      checkQuery,
+      [DoctorID, schedule.AvailableDate, schedule.EndTime, schedule.StartTime],
+      (err, results) => {
+        if (err) return res.json({ error: err });
+
+        if (results.length > 0) {
+          return res.json({
+            message: "This slot is already booked. Choose another slot.",
+          });
+        }
+
+        // Proceed with booking
+        const insertQuery = `
+        INSERT INTO Appointment (PatientID, DoctorID, ScheduleID)
+        VALUES (?, ?, ?)
+      `;
+        db.query(insertQuery, [PatientID, DoctorID, ScheduleID], (err) => {
+          if (err) return res.json({ error: err });
+          res.json({ message: "Appointment Booked!" });
+        });
+      }
+    );
   });
 });
 

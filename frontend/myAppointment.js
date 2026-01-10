@@ -1,32 +1,31 @@
+const patientID = prompt("Enter your Patient ID:");
 
-      // Set Patient ID here (e.g., saved after login)
-        const patientID = sessionStorage.getItem("patientID");
-        console.log("Patient ID from session:", patientID);
+if (!patientID || patientID.trim() === "") {
+  alert("Patient ID is required.");
+  throw new Error("Patient ID missing");
+}
 
-      fetch(`http://localhost:5000/patient-appointments/${patientID}`)
-        .then(res => res.json())
-        .then(data => {
-          const tbody = document.querySelector("tbody");
-          tbody.innerHTML = "";
+fetch(`http://localhost:5000/patient-appointments/${patientID}`)
+  .then((res) => res.json())
+  .then((data) => {
+    const tbody = document.getElementById("mydata");
 
-          data.forEach(a => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${a.AppointmentID}</td>
-              <td>${a.DoctorName}</td>
-              <td>${a.DoctorSpecialization}</td>
-              <td>${a.AppointmentDate}</td>
-              <td>${a.StartTime} - ${a.EndTime}</td>
-              <td>${a.AppointmentStatus}</td>
-            `;
-            tbody.appendChild(tr);
-            console.log(tr);
-            console.log(tbody);
-          });
-        })
-        .catch(err => {
-          document.querySelector("tbody").innerHTML =
-            `<tr><td colspan="6">Failed to load.</td></tr>`;
-          console.error(err);
-        });
-    
+    // If patient does not exist or has no records
+    if (!Array.isArray(data) || data.length === 0) {
+      alert("Invalid Patient ID. No records found.");
+      return; // HALT system
+    }
+
+    data.forEach((a) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${a.DoctorName}</td>
+          <td>${a.AppointmentDate}</td>
+          <td>${a.StartTime} - ${a.EndTime}</td>
+          <td>${a.AppointmentStatus}</td>
+        </tr>`;
+    });
+  })
+  .catch(() => {
+    alert("Unable to fetch appointments. Please try again.");
+  });

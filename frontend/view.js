@@ -1,33 +1,15 @@
-const API_URL = "http://localhost:5000/appointments";
-
-fetch(API_URL)
+fetch("http://localhost:5000/appointments")
   .then((res) => res.json())
   .then((data) => {
-    const tbody = document.querySelector("tbody");
-    tbody.innerHTML = "";
-
-    data.forEach((row) => {
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-              <td>${row.AppointmentID}</td>
-              <td>${row.PatientName}</td>
-              <td>${row.PatientPhone}</td>
-              <td>${row.PatientGender}</td>
-              <td>${row.DoctorName}</td>
-              <td>${row.DoctorSpecialization}</td>
-              <td>${row.AppointmentDate}</td>
-              <td>${row.StartTime}</td>
-              <td>${row.EndTime}</td>
-              <td>${row.AppointmentStatus}</td>
-            `;
-
-      tbody.appendChild(tr);
+    const tbody = document.getElementById("data");
+    data.forEach((a) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${a.AppointmentID}</td>
+          <td>${a.PatientName}</td>
+          <td>${a.DoctorName}</td>
+          <td>${a.AppointmentDate}</td>
+          <td>${a.AppointmentStatus}</td>
+        </tr>`;
     });
-  })
-  .catch((err) => {
-    console.error("Error loading:", err);
-    document.querySelector(
-      "tbody"
-    ).innerHTML = `<tr><td colspan="10">Error loading appointments.</td></tr>`;
   });

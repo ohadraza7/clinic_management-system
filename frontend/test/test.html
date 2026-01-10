@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Clinic Frontend Test Cases</title>
+  </head>
+  <body>
+    <h2>Clinic Management Frontend Tests</h2>
+
+    <script>
+      const BASE_URL = "http://localhost:5000";
+
+      /* -------------------------
+         ASSERTION HELPER
+      -------------------------- */
+      function assert(condition, message) {
+        if (!condition) {
+          console.error("❌ FAIL:", message);
+        } else {
+          console.log("✅ PASS:", message);
+        }
+      }
+
+      /* -------------------------
+         TC-01: Patient Validation
+      -------------------------- */
+      function validatePatient(name, phone, gender) {
+        return !!(name && phone && gender);
+      }
+
+      assert(validatePatient("", "0300", "Male") === false, "TC-01 Empty name rejected");
+      assert(validatePatient("Ali", "", "Male") === false, "TC-01 Empty phone rejected");
+      assert(validatePatient("Ali", "03001234567", "Male") === true, "TC-01 Valid patient accepted");
+
+      /* -------------------------
+         TC-02: Create Patient API
+      -------------------------- */
+      async function testCreatePatient() {
+        const res = await fetch(`${BASE_URL}/patient`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            Name: "",
+            Phone: "03001234567",
+            Gender: "@"
+          })
+        });
+
+        const data = await res.json();
+        assert(data.PatientID !== undefined, "TC-02 PatientID returned from backend");
+
+        sessionStorage.setItem("patientID", data.PatientID);
+      }
+      testCreatePatient();
+
+      /* -------------------------
+         TC-03: Fetch Doctors
+      -------------------------- */
+      async function testFetchDoctors() {
+        const res = await fetch(`${BASE_URL}/doctors`);
+        const data = await res.json();
+
+        assert(Array.isArray(data), "TC-03 Doctors response is array");
+        assert(data.length > 0, "TC-03 Doctors list not empty");
+      }
+      testFetchDoctors();
+
+      /* -------------------------
+         TC-04: Fetch Schedules
+      -------------------------- */
+      async function testSchedules() {
+        const doctorID = 1;
+        const res = await fetch(`${BASE_URL}/schedules/${doctorID}`);
+        const data = await res.json();
+
+        assert(Array.isArray(data), "TC-04 Schedule response is array");
+      }
+      testSchedules();
+
+      /* -------------------------
+         TC-05: Appointment Booking
+      -------------------------- */
+      async function testBooking() {
+        const patientID = sessionStorage.getItem("patientID");
+
+        const res = await fetch(`${BASE_URL}/book`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            PatientID: patientID,
+            DoctorID: 1,
+            ScheduleID: 1
+          })
+        });
+
+        const data = await res.json();
+        assert(data.message !== undefined, "TC-05 Booking response received");
+      }
+      testBooking();
+
+      /* -------------------------
+         TC-06: Prevent Overlapping
+      -------------------------- */
+      async function testOverlap() {
+        const patientID = sessionStorage.getItem("patientID");
+
+        const res = await fetch(`${BASE_URL}/book`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            PatientID: patientID,
+            DoctorID: 1,
+            ScheduleID: 1
+          })
+        });
+
+        const data = await res.json();
+        assert(
+          data.message.includes("already booked"),
+          "TC-06 Overlapping appointment rejected"
+        );
+      }
+      testOverlap();
+
+      /* -------------------------
+         TC-07: Patient Appointments
+      -------------------------- */
+      async function testPatientAppointments() {
+        const patientID = sessionStorage.getItem("patientID");
+
+        const res = await fetch(`${BASE_URL}/patient-appointments/${patientID}`);
+        const data = await res.json();
+
+        assert(Array.isArray(data), "TC-07 Appointments response is array");
+      }
+      testPatientAppointments();
+    </script>
+  </body>
+</html>

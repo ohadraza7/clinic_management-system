@@ -1,38 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
     <title>All Appointments</title>
     <link rel="stylesheet" href="style.css" />
     <script src="view.js" defer></script>
   </head>
   <body>
-    <h1>All Appointments</h1>
-
-    <div class="table-container">
-      <table id="appointments-table">
+    <div class="container">
+      <h2>All Appointments</h2>
+      <table>
         <thead>
           <tr>
-            <th>AppointmentID</th>
+            <th>ID</th>
             <th>Patient</th>
-            <th>Phone</th>
-            <th>Gender</th>
             <th>Doctor</th>
-            <th>Specialization</th>
             <th>Date</th>
-            <th>Start</th>
-            <th>End</th>
             <th>Status</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="data"></tbody>
       </table>
-    </div>
-
-    <div class="nav">
-      <a href="index.html">Home</a> >
-      <a href="view.html">View Appointments</a> >
-      <a href="myAppointment.html">My Appointments</a>
     </div>
   </body>
 </html>
